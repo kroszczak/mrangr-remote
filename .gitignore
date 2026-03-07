@@ -1,0 +1,4 @@
+*.tif
+*.sif
+*.deb
+.DS_Store
