@@ -56,7 +56,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 5. Build + push
+      # 5. Build + push (gzip compression + no provenance for old Singularity on PCSS)
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -67,6 +67,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
+          outputs: type=image,push=true,compression=gzip,force-compression=true
 
       # 6. Podsumowanie (wypisz wersje R i terra w logu)
       - name: Print image info

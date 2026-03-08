@@ -6,9 +6,9 @@ LABEL description="RStudio Server + terra + Miniconda (amd64, for PCSS Eagle/Alt
 # Systemowe zależności dla pakietu R 'terra'
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        libproj-dev \
-        libgdal-dev \
-        libgeos-dev && \
+    libproj-dev \
+    libgdal-dev \
+    libgeos-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
