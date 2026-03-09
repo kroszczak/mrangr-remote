@@ -4,7 +4,7 @@
 
 grant="pl0090-01"
 DATA=$HOME/${grant}/project_data
-CONTAINER=${DATA}/kacros_images/images/rstudio_latest.sif
+CONTAINER=${DATA}/kacros_images/images/rstudio_sandbox
 SCRATCH=$HOME/${grant}/scratch/$USER
 
 # Katalogi robocze kontenera

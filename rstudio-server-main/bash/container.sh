@@ -6,13 +6,17 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=kacros1@st.amu.edu.pl
 
-# Import kontenera rstudio z Docker Hub i konwersja do formatu Singularity (.sif).
-# Obraz jest budowany automatycznie przez GitHub Actions (linux/amd64).
+# Import kontenera rstudio z Docker Hub i budowa sandbox (folder) Singularity.
+# Obraz Docker jest budowany automatycznie przez GitHub Actions (linux/amd64).
+#
+# UWAGA: Używamy --sandbox zamiast .sif, ponieważ Singularity CE na Eagle
+# tworzy squashfs z kompresją zstd, której jądro Linux na Eagle nie obsługuje.
 
 grant="pl0090-01"
 
 DATA=$HOME/${grant}/project_data
 IMAGES=${DATA}/kacros_images/images
+SANDBOX=${IMAGES}/rstudio_sandbox
 
 # Cache i tmp na partycji grantowej (home ma za małą quotę)
 export SINGULARITY_CACHEDIR=${DATA}/kacros_images/cache
@@ -23,19 +27,18 @@ mkdir -p "$SINGULARITY_CACHEDIR"
 mkdir -p "$SINGULARITY_TMPDIR"
 mkdir -p "$IMAGES"
 
-cd "$IMAGES"
-
-echo "[$(date)] Pobieranie obrazu z Docker Hub..."
-singularity pull --force --name rstudio_latest.sif docker://kroszczark/mrangr-server-agent:latest
+echo "[$(date)] Pobieranie obrazu z Docker Hub (sandbox)..."
+singularity build --sandbox --force "$SANDBOX" docker://kroszczark/mrangr-server-agent:latest
 echo "[$(date)] Gotowe."
 
-ls -lh "$IMAGES"
+ls -lhd "$SANDBOX"
 
 # Smoke test
 echo "[$(date)] Weryfikacja obrazu..."
-singularity exec rstudio_latest.sif Rscript -e 'library(terra); cat("terra OK, wersja:", as.character(packageVersion("terra")), "\n")'
-singularity exec rstudio_latest.sif conda --version
+singularity exec "$SANDBOX" Rscript -e 'library(terra); cat("terra OK, wersja:", as.character(packageVersion("terra")), "\n")'
+singularity exec "$SANDBOX" conda --version
+echo "[$(date)] Weryfikacja zakończona."
 
-# Sprzątanie cache (opcjonalnie — zakomentuj jeśli chcesz zachować cache)
+# Sprzątanie cache
 rm -rf "$SINGULARITY_CACHEDIR"
 rm -rf "$SINGULARITY_TMPDIR"
